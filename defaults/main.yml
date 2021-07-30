@@ -1,0 +1,26 @@
+---
+# defaults file for awstest
+# vpc
+vpcname: "testvpc"
+cidr_block: "10.0.0.0/16"
+region: "ap-northeast-1"
+# subnet
+az: "ap-northeast-1a"
+public_subnet_name: "test_public_subnet"
+public_cidr_block: "10.0.10.0/24"
+private_subnet_name: "test_private_subnet"
+private_cidr_block: "10.0.20.0/24"
+# internet gateway
+# security group
+# route table
+# ec2
+keypair: "for_sample"
+# load balancer
+# resource state
+vpc_state:         "present"
+private_subnet_state: "absent"
+public_subnet_state:  "absent"
+igw_state:     "absent"
+sg_state:      "absent"
+ec2_state:     "absent"
+

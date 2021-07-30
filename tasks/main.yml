@@ -1,0 +1,35 @@
+---
+# tasks file for awstest
+- name: "create VPC"
+  amazon.aws.ec2_vpc_net:
+    name: "{{ vpcname }}"
+    cidr_block: "{{ cidr_block }}"
+    region: "{{ retion }}"
+    state: "{{ vpc_state }}"
+  register: vpc
+
+- name: "create public subnet"
+  amazon.aws.ec2_vpc_subnet:
+    vpc_id: "{{ vpc.vpc.id }}"
+    cidr_block: "{{ public_cidr_block }}"
+    region: "{{ retion }}"
+    az: "{{ az }}"
+    tags:
+      - Name: "{{ public_subnet_name }}"
+    wait: yes
+    state: "{{ public_subnet_state }}"
+  register: public_subnet
+
+- name: "create private subnet"
+  amazon.aws.ec2_vpc_subnet:
+    vpc_id: "{{ vpc.vpc.id }}"
+    cidr_block: "{{ private_cidr_block }}"
+    region: "{{ retion }}"
+    az: "{{ az }}"
+    tags:
+      - Name: "{{ private_subnet_name }}"
+    wait: yes
+    state: "{{ private_subnet_state }}"
+  register: public_subnet
+
+
