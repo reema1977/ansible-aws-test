@@ -1,26 +1,46 @@
 ---
-# defaults file for awstest
+# defaults file for aws test
 # vpc
-vpcname: "testvpc"
+vpcname: "ansible_vpc"
 cidr_block: "10.0.0.0/16"
 region: "ap-northeast-1"
-# subnet
 az: "ap-northeast-1a"
-public_subnet_name: "test_public_subnet"
+# public subnet
+public_subnet_name: "ansible_public_subnet"
 public_cidr_block: "10.0.10.0/24"
-private_subnet_name: "test_private_subnet"
-private_cidr_block: "10.0.20.0/24"
+public_route_table_name: "ansible_public_route"
 # internet gateway
+igw_name: "ansible_igw"
+# private subnet
+private_subnet_name: "ansible_private_subnet"
+private_cidr_block: "10.0.20.0/24"
+private_route_table_name: "ansible_private_route"
+# nat gateway
+ngw_name: "ansible_ngw"
 # security group
-# route table
-# ec2
-keypair: "for_sample"
+sg_name: "ansible_security_group"
+source_ip: "124.140.41.40"
+# public ec2
+pub_ec2_name: "ansible_public_ec2"
+pub_ec2_key_name: "for_sample"
+pub_ec2_image: "ami-09ebacdc178ae23b7"
+pub_ec2_type: "t2.micro"
+pub_ec2_vol_dev: "/dev/xvda"
+pub_ec2_vol_size: 8
+pub_ec2_vol_type: "gp2"
+pub_ec2_count: 1
+pub_ec2_mon: "no"
+pub_ec2_pub_ip: "yes"
 # load balancer
 # resource state
-vpc_state:         "present"
+vpc_state: "absent"
+public_subnet_state: "absent"
 private_subnet_state: "absent"
-public_subnet_state:  "absent"
-igw_state:     "absent"
-sg_state:      "absent"
-ec2_state:     "absent"
+igw_state: "absent"
+ngw_state: "absent"
+public_route_table_state: "absent"
+private_route_table_state: "absent"
+sg_state: "absent"
+public_ec2_state: "absent"
+private_ec2_state: "absent"
 
