@@ -1,113 +1,72 @@
 ---
-# tasks file for awsansible
+# tasks file for aws environment
 - name: "create VPC"
   amazon.aws.ec2_vpc_net:
-    name: "{{ vpcname }}"
+    name: "{{ vpc_name }}"
     region: "{{ region }}"
-    cidr_block: "{{ cidr_block }}"
-    state: "{{ vpc_state }}"
+    cidr_block: "{{ vpc_cidr }}"
+    state: present
   register: vpc
 
 - name: "create public subnet"
   amazon.aws.ec2_vpc_subnet:
-    region: "{{ region }}"
     vpc_id: "{{ vpc.vpc.id }}"
-    cidr: "{{ public_cidr_block }}"
+    cidr: "{{ pub_cidr }}"
     az: "{{ az }}"
     tags:
-      Name: "{{ public_subnet_name }}"
+      Name: "{{ pub_sub_name }}"
     wait: yes
-    state: "{{ public_subnet_state }}"
+    state: "present"
   register: public_subnet
 
 - name: "create internet gateway"
   community.aws.ec2_vpc_igw:
-    region: "{{ region }}"
     vpc_id: "{{ vpc.vpc.id }}"
     tags:
       Name: "{{ igw_name }}"
-    state: "{{ igw_state }}"
+    state: "present"
   register: igw
 
 - name: "create public route table"
   community.aws.ec2_vpc_route_table:
-    region: "{{ region }}"
     vpc_id: "{{ vpc.vpc.id }}"
     subnets:
-      - "{{ public_subnet.subnet.id}}"
+      - "{{ public_subnet.subnet.id }}"
     routes:
       - dest: 0.0.0.0/0
         gateway_id: "{{ igw.gateway_id }}"
     tags:
-      Name: "{{ public_route_table_name }}"
-    state: "{{ public_route_table_state }}"
+      Name: "{{ pub_sub_rt_name }}"
+    state: "present"
   register: public_route_table
-
-- name: "create private subnet"
-  amazon.aws.ec2_vpc_subnet:
-    region: "{{ region }}"
-    vpc_id: "{{ vpc.vpc.id }}"
-    cidr: "{{ private_cidr_block }}"
-    az: "{{ az }}"
-    tags:
-      Name: "{{ private_subnet_name }}"
-    wait: yes
-    state: "{{ private_subnet_state }}"
-  register: private_subnet
-
-- name: "create nat gateway"
-  community.aws.ec2_vpc_nat_gateway:
-    region: "{{ region }}"
-    subnet_id: "{{ private_subnet.subnet.id }}"
-    if_exist_do_not_create: yes
-    release_eip: yes
-    tags:
-      Name: "{{ ngw_name }}"
-    wait: yes
-    state: "{{ ngw_state }}"
-  register: ngw
-
-- name: "create private route table"
-  community.aws.ec2_vpc_route_table:
-    region: "{{ region }}"
-    vpc_id: "{{ vpc.vpc.id }}"
-    subnets:
-      - "{{ private_subnet.subnet.id}}"
-    routes:
-      - dest: 0.0.0.0/0
-        gateway_id: "{{ ngw.nat_gateway_id }}"
-    tags:
-      Name: "{{ private_route_table_name }}"
-    state: "{{ private_route_table_state }}"
-  register: private_route_table
 
 - name: "create security group"
   amazon.aws.ec2_group:
-    name: "{{ sg_name }}"
-    region: "{{ region }}"
+    name: "ansible_security_group"
     vpc_id: "{{ vpc.vpc.id }}"
-    desctiption: "sg for public ec2"
+    description: "sg for public ec2"
     rules:
       - proto: "tcp"
-        ports:
-          - 80
+        ports: 
           - 22
-          - 443
-        cidr_ip: "{{ source_ip }}"
+          - 4789
+        cidr_ip: "{{ local_addr }}"
       - proto: "icmp"
         ports: -1
-        cidr_ip: "{{ source_ip }}"
+        cidr_ip: "{{ local_addr }}"
     tags:
-      Name: "{{ sg_name }}"
-    state: "{{ sg_state }}"
+      Name: "ansible_public_ec2_sg"
+    state: "present"
   register: sg
-
+   
 - name: "create public ec2"
   amazon.aws.ec2:
     region: "{{ region }}"
     vpc_subnet_id: "{{ public_subnet.subnet.id }}"
     image: "{{ pub_ec2_image }}"
     instance_type: "{{ pub_ec2_type }}"
+    instance_tags:
+      Name: "{{ pub_ec2_name }}"
     key_name: "{{ pub_ec2_key_name }}"
     group_id: "{{ sg.group_id }}"
     volumes:
@@ -119,5 +78,4 @@
       Name: "{{ pub_ec2_name }}"
     monitoring: "{{ pub_ec2_mon }}"
     assign_public_ip: "{{ pub_ec2_pub_ip }}"
-    state: "{{ public_ec2_state }}"
-    
+
