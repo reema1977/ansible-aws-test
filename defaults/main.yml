@@ -1,5 +1,6 @@
 ---
 # defaults file for aws test
+ec2_key_name: "for_sample"
 vpc_name: "vpc1"
 region: "ap-northeast-1"
 az: "ap-northeast-1a"
@@ -9,7 +10,7 @@ pub_sub_name: "pubsub1"
 igw_name: "igw1"
 pub_sub_rt_name: "pub sub route1"
 pub_ec2_name: "instance1"
-pub_ec2_key_name: "for_sample"
+# Amazon Linux2 Arm
 pub_ec2_image: "ami-09c4848c1c6c4b09b"
 pub_ec2_type: "t4g.micro"
 pub_ec2_vol_dev: "/dev/xvda"
@@ -18,5 +19,8 @@ pub_ec2_vol_type: "gp3"
 pub_ec2_count: 1
 pub_ec2_mon: "no"
 pub_ec2_pub_ip: "yes"
+pub_open_tcp_ports:
+  - 22
+  - 9100
 local_addr: "xxx.xxx.xxx.xxx/32"
 
